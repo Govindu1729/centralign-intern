@@ -15,7 +15,7 @@ source venv/bin/activate
 pip install -q -r requirements.txt 2>/dev/null
 
 # Start server in background
-echo "🔌 Starting Flask Portal (http://localhost:5000)..."
+echo "🔌 Starting Flask Portal (http://localhost:5001)..."
 python app.py &
 SERVER_PID=$!
 
