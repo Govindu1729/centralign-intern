@@ -5,6 +5,10 @@ Uses ReAct loop to find, extract, and log invoices.
 """
 
 import os
+<<<<<<< HEAD
+=======
+import re
+>>>>>>> fa4293cf337affacd74154b0855ecae187abb407
 import json
 import time
 from playwright.sync_api import sync_playwright
@@ -80,6 +84,7 @@ def agent_loop(prompt):
     """Main agent loop: Find -> Extract -> Act -> Verify"""
     print(f"🤖 Agent received: {prompt}")
     
+<<<<<<< HEAD
     try:
         # Step 1: Find invoice
         print("🔍 Finding latest invoice...")
@@ -115,6 +120,36 @@ def agent_loop(prompt):
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
         return False
+=======
+    # Step 1: Find invoice
+    print("🔍 Finding latest invoice...")
+    invoice_path = find_latest_invoice()
+    print(f"   Found: {invoice_path}")
+    
+    # Step 2: Read and extract
+    print("📄 Reading invoice...")
+    text = read_invoice_text(invoice_path)
+    print(f"   Content preview: {text[:100]}...")
+    
+    print("🧠 Extracting data with LLM...")
+    data = extract_invoice_data(text)
+    print(f"   Extracted: {json.dumps(data, indent=2)}")
+    
+    # Step 3: Log to portal
+    print("🌐 Submitting to portal...")
+    success = log_invoice_to_portal(
+        vendor=data["vendor"],
+        amount=data["amount"],
+        due_date=data["due_date"]
+    )
+    
+    if success:
+        print("✅ Invoice logged successfully!")
+    else:
+        print("❌ Verification failed. Check portal.")
+    
+    return success
+>>>>>>> fa4293cf337affacd74154b0855ecae187abb407
 
 if __name__ == "__main__":
     # Default prompt for sprint demo
