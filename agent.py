@@ -175,9 +175,6 @@ def log_invoice_to_portal(vendor, amount, due_date, url="http://localhost:5001")
     except Exception as e:
         print(f"  ❌ Portal Error: {type(e).__name__}: {e}")
         return False, {"error": str(e), "status": "failed"}
-    finally:
-        if browser:
-            browser.close()
 
 
 def agent_loop(prompt, invoice_dir="./invoices", max_retries=2, recursive=True):
