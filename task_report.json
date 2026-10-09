@@ -1,0 +1,15 @@
+{
+  "task": "Find the latest invoice from Acme Corp, extract the amount and due date, and log it into the internal system.",
+  "invoice_file": "./invoices/acme_invoice.txt",
+  "extracted_data": {
+    "vendor": "Acme Corp",
+    "amount": 1500.0,
+    "due_date": "2026-10-20"
+  },
+  "success": false,
+  "evidence": {
+    "error": "Timeout",
+    "status": "failed"
+  },
+  "timestamp": "2026-10-09 13:44:01"
+}

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from flask import Flask, request, redirect, url_for
-=======
-from flask import Flask, request, render_template_string
->>>>>>> fa4293cf337affacd74154b0855ecae187abb407
+from flask import Flask, request, redirect, render_template_string
 
 app = Flask(__name__)
 
@@ -36,10 +32,6 @@ FORM_TEMPLATE = """
         <button type="submit">Submit Invoice</button>
     </form>
     <script>
-<<<<<<< HEAD
-=======
-        // Check URL for success param on load
->>>>>>> fa4293cf337affacd74154b0855ecae187abb407
         const params = new URLSearchParams(window.location.search);
         if (params.get('status') === 'success') {
             document.getElementById('success-banner').style.display = 'block';
@@ -59,16 +51,8 @@ def log_invoice():
     vendor = request.form.get('vendor')
     amount = request.form.get('amount')
     due_date = request.form.get('due_date')
-<<<<<<< HEAD
     return redirect(f"/?status=success&vendor={vendor}&amount={amount}&date={due_date}")
 
-=======
-    
-    # In a real app, this would save to DB. Here we just confirm receipt.
-    return redirect(f"/?status=success&vendor={vendor}&amount={amount}&date={due_date}")
-
-from flask import redirect, url_for
-
->>>>>>> fa4293cf337affacd74154b0855ecae187abb407
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Listen on ALL interfaces (0.0.0.0) so both browser and curl can access
+    app.run(host='0.0.0.0', port=5001, debug=False)
