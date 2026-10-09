@@ -1,0 +1,7 @@
+INVOICE
+Vendor: Acme Corp
+Date: 2026-10-01
+Amount: 1500.00
+Due Date: 2026-10-20
+Description: Cloud Infrastructure Services
+Invoice Number: INV-2026-001
