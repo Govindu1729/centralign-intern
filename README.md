@@ -1,54 +1,39 @@
-# CentrAlign AI Internship - Autonomous Agent Sprint
+# CentrAlign AI Internship - Autonomous Invoice Processor
 
-**Project:** Autonomous Invoice Processor Agent  
-**Stack:** Python, Flask, Playwright  
-**Date:** Oct 2026  
-**Status:** ✅ FULLY COMPLETE
-**Repo:** https://github.com/Govindu1729/centralign-intern
+## Project Overview
+I am building a Python-based invoice-processing agent that discovers invoice files, extracts structured data through a configurable LLM interface, and submits the results to a local web portal using Playwright.
 
-## 🎯 Objective
-Build an autonomous agent that finds invoice files (txt, pdf, docx), extracts structured data using a configurable LLM interface, and logs them to an internal portal using browser automation, with **self-healing recovery**, **visual evidence**, and **recursive discovery**.
+**Repository:** https://github.com/Govindu1729/centralign-intern
 
-## 🏗️ Architecture
-```
-User Prompt → Agent Loop (ReAct + Retries)
-    │
-    ├─ Find → Recursive Scan of ./invoices/
-    │
-    ├─ Read → Text or PDF (via pdf_extractor)
-    │
-    ├─ Extract → LLM Interface (llm_service)
-    │
-    ├─ Act → Playwright → Self-Healing Form Fill
-    │                └─ Screenshots for evidence
-    │
-    └─ Report → JSON summary (task_report.json)
-```
+---
 
-## 🧠 Key Features
+## 🏗️ Implementation Status
 
-| Category | Feature | Description |
-|----------|---------|-------------|
-| **Autonomy** | Full ReAct Loop | Finds → Reads → Extracts → Submits → Verifies |
-| **Recovery** | Self-Healing | Tries 3 selector strategies per field (name, id, type) |
-| **Recovery** | Bounded Retries | Attempts task up to N times before failing |
-| **Evidence** | Visual Audit Trail | Captures screenshots at every step |
-| **Evidence** | Structured Report | Generates `task_report.json` with status & metadata |
-| **Discovery** | Recursive Search | Scans subdirectories for invoices |
-| **Discovery** | Multi-format | Supports .txt, .pdf, .docx |
-| **Config** | LLM Interface | Configurable via environment variables (mock, ollama, openai) |
+### ✅ Implemented Features
 
-## 💻 Code Structure
+| Component | Details |
+|-----------|---------|
+| **File Discovery** | Recursive search across `./invoices/` directory; selects file by modification time |
+| **Text Extraction** | Native support for `.txt` and `.doc` files |
+| **PDF Extraction** | Modular `pdf_extractor.py` with fallback libraries (PyMuPDF, pdfplumber, PyPDF2) |
+| **DOCX Extraction** | `python-docx` integration for Word documents |
+| **LLM Interface** | Configurable provider interface (`llm_service.py`) supporting mock, Ollama, OpenAI, Anthropic |
+| **Browser Automation** | Playwright fills and submits the local portal form |
+| **Self-Healing Recovery** | Tries 3 selector strategies (name, id, type) if primary selector fails |
+| **Bounded Retries** | Configurable retry attempts (`max_retries=2` by default) |
+| **Visual Evidence** | Screenshots captured at every step (`screenshots/` directory) |
+| **Structured Reporting** | JSON completion report generated (`task_report.json`) |
 
-| File | Purpose |
-|------|---------|
-| `agent.py` | Main ReAct loop with bounded retries |
-| `app.py` | Flask internal portal (port 5001) |
-| `llm_service.py` | Configurable LLM interface (mock default) |
-| `pdf_extractor.py` | Multi-library PDF text extraction |
-| `requirements.txt` | Dependencies (flask, playwright, optional pdf libs) |
-| `task_report.json` | Generated completion record |
-| `screenshots/` | Generated visual evidence |
+### ⏳ In Progress / Pending
+
+| Component | Notes |
+|-----------|-------|
+| **Real LLM Integration** | Provider interface exists; mock provider is default for testing. Active work: connect and validate real extraction. |
+| **Persistent Storage** | Portal does not save submitted records to database; uses URL parameters for demo |
+| **Duplicate Detection** | Not yet implemented |
+| **End-to-End Testing** | Fresh pipeline validation with real LLM provider pending |
+
+---
 
 ## 🚀 Quick Start
 
@@ -59,31 +44,133 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-**2. (Optional) Configure LLM**
-*By default, `mock` is used for testing.*
+**2. (Optional) Configure LLM Provider**
 ```bash
+# Default: mock provider (deterministic testing)
+
 # For Ollama
 export LLM_PROVIDER=ollama
 export LLM_BASE_URL=http://localhost:11434
 
 # For OpenAI
 export LLM_PROVIDER=openai
-export LLM_API_KEY=sk-...
+export LLM_API_KEY=***
+
+# For Anthropic
+export LLM_PROVIDER=anthropic
+export LLM_API_KEY=***
 ```
 
-**3. Run Demo**
+**3. Run the Agent**
 ```bash
-# Terminal 1
+# Terminal 1: Start portal
 python app.py
 
-# Terminal 2
+# Terminal 2: Run agent
 python agent.py
 ```
 
-## 📝 Interview Notes
+---
 
-- **Reliability:** Uses bounded retries (`max_retries=2`) so it doesn't hang forever.
-- **Evidence:** Every step is captured in `task_report.json` and `screenshots/`.
-- **Scalability:** Recursive search + PDF support allows processing folders of files.
-- **LLM Flexibility:** Swaps between mock/ollama/openai via env vars (no code change).
-- **Troubleshooting:** Fixed Flask binding (`0.0.0.0`) and Playwright sandbox (`--no-sandbox`) for macOS compatibility.
+## 🧠 Architecture
+
+```
+User Prompt
+    │
+    ▼
+┌─────────────────────────────────────────────────────────┐
+│              Agent Loop (ReAct + Retries)               │
+└─────────────────────────────────────────────────────────┘
+         │                    │
+         │                    │
+         ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐
+│  Discovery      │  │  Verification   │
+│  - Recursive    │  │  - DOM Check    │
+│  - By mtime     │  │  - Screenshots  │
+└─────────────────┘  └─────────────────┘
+         │                    │
+         │                    │
+         ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐
+│  Reading        │  │  Reporting      │
+│  - TXT/DOC      │  │  - JSON (task_  │
+│  - PDF          │  │    report.json) │
+│  - DOCX         │  │  - Timestamp    │
+└─────────────────┘  └─────────────────┘
+         │
+         │
+         ▼
+┌─────────────────┐
+│  LLM Extract    │
+│  - Configurable │
+│  - Validate     │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Playwright     │
+│  - Self-healing │
+│  - Retries      │
+└─────────────────┘
+```
+
+---
+
+## 🔧 Key Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| **Modular LLM Interface** | Allows swapping providers (mock/ollama/openai) without code changes |
+| **Bounded Retries** | Prevents infinite loops while still recovering from transient failures |
+| **Selector Fallbacks** | Handles minor HTML changes (e.g., dynamic class names) |
+| **Recursive Search** | Finds invoices in subdirectories without manual path specification |
+| **Screenshot Evidence** | Provides visual proof of execution, not just logs |
+
+---
+
+## 📝 Testing Checklist
+
+- [x] **Discovery**: Recursive search finds latest file by modification time
+- [x] **TXT Extraction**: Reads text files successfully
+- [x] **PDF Module**: Library available (needs `pymupdf` for actual parsing)
+- [x] **Selector Recovery**: Tries alternative selectors when primary fails
+- [x] **Portability**: Fixed port 5001; Flask binds to `0.0.0.0`
+- [ ] **Live LLM Extraction**: Pending provider connection
+- [ ] **End-to-End Pipeline**: Needs verification with real invoice
+
+---
+
+## 🔮 Next Steps
+
+1. **Connect LLM Provider**: Integrate OpenAI/Ollama/Anthropic API
+2. **Add Validation**: Ensure extracted fields match expected formats
+3. **Implement Persistence**: Store results in database
+4. **Add Duplicate Detection**: Prevent re-processing same invoice
+
+---
+
+## 📦 Dependencies
+
+**Required:**
+- Flask
+- Playwright
+
+**Optional:**
+- PyMuPDF (PDF extraction)
+- pdfplumber (PDF extraction fallback)
+- PyPDF2 (PDF extraction fallback)
+- python-docx (Word document extraction)
+- openai (for OpenAI provider)
+- anthropic (for Anthropic provider)
+
+**Note:** The agent runs out-of-the-box with mock LLM for demonstration.
+
+---
+
+## ⚠️ Limitations
+
+- Uses mock LLM responses by default (requires provider configuration for real extraction)
+- PDF parsing requires additional library installation (`pymupdf`, `pdfplumber`, or `PyPDF2`)
+- No database persistence; portal stores data temporarily in session
+- Form selector recovery limited to 3 alternatives
