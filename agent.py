@@ -66,8 +66,10 @@ def fill_field_with_retry(page, value, selectors, name, timeout=10000):
             elem = page.wait_for_selector(selector, state="visible", timeout=timeout)
             print(f"  ✅ FOUND: {selector}")
             
-            # Clear and fill the element
-            elem.clear()
+            # Clear the element's current content using JavaScript
+            elem.evaluate("el => el.value = ''")
+            
+            # Fill the element
             elem.fill(str(value))
             print(f"  ✅ FILLED: {selector} with value: {value}")
             return True, selector
